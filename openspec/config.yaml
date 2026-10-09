@@ -1,0 +1,55 @@
+schema: spec-driven
+
+context: |
+  Proyecto: demo didactica "AI Day" de Flock IT. Chat agent RAG sobre Gestion de Talento (greenfield, sin codigo aun).
+  Stack: Python + Streamlit (st.chat_input/st.chat_message/st.session_state) + ChromaDB local (./chroma_db, embeddings DEFAULT locales).
+  LLM: OpenRouter modelo :free via SDK `openai` (base_url https://openrouter.ai/api/v1); OPENROUTER_API_KEY en .env (python-dotenv, gitignored).
+  Arquitectura: loop RAG escrito a mano (SIN LangChain/LangGraph, a proposito, por aprendizaje): chunking -> indexado -> retrieval -> prompt -> LLM.
+  Base de conocimiento: docs/*.md (Spanish, headings ##/###); hoy docs/proceso.md.
+  UI: DEBE seguir skill flock-brand-design (paleta/logos Flock). Idioma de la app y artefactos: espanol.
+  Testing: pytest 8.4.2 instalado en .venv. Estilo: sin linter/formatter configurado.
+
+strict_tdd: true
+
+testing:
+  runner:
+    framework: pytest
+    command: ".venv/bin/pytest"
+    installed: true
+    version: "8.4.2"
+    note: "Instalado en .venv (requirements.txt). Suite offline: fakes para embeddings y LLM."
+  layers:
+    unit: {available: true, tool: pytest}
+    integration: {available: true, tool: pytest + chromadb EphemeralClient + FakeEmbeddingFunction}
+    e2e: {available: true, tool: streamlit.testing.v1.AppTest (offline)}
+  coverage: {available: false, command: null}
+  quality:
+    linter: {available: false, command: null}
+    type_checker: {available: false, command: null}
+    formatter: {available: false, command: null}
+  detected: 2026-10-09
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+    - Identify affected modules/packages
+  specs:
+    - Use Given/When/Then format for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+  design:
+    - Include sequence diagrams for complex flows
+    - Document architecture decisions with rationale
+    - Do NOT use LangChain/LangGraph; rag-implementation skill is concepts-only (its code uses LangChain)
+  tasks:
+    - Group tasks by phase (infrastructure, implementation, testing)
+    - Use hierarchical numbering (1.1, 1.2, etc.)
+    - Keep tasks small enough to complete in one session
+  apply:
+    - Follow existing code patterns and conventions
+    - UI work MUST follow flock-brand-design skill
+    - Never build after changes; use bat/rg/fd/sd/eza instead of cat/grep/find/sed/ls
+  verify:
+    - Run tests if test infrastructure exists
+    - Compare implementation against every spec scenario
+  archive:
+    - Warn before merging destructive deltas (large removals)
